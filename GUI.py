@@ -14,6 +14,6 @@ user_entry.pack(pady=12,padx=10)
 password_entry = ctk.CTkEntry(master=frame,placeholder_text="password",show="*")
 password_entry.pack(pady=12,padx=10)
 
-button =ctk
-
+button =ctk.CTkButton(master=frame, text=Login, width=120, height=32, border_width = 2)
+button.pack(padx=0,pady=10)
 root.mainloop()
