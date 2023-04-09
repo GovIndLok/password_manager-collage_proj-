@@ -1,63 +1,105 @@
-import customtkinter as ctk
+from customtkinter import *
+import tkinter as tk
+import login_module 
 
-ctk.set_appearance_mode("System")
-ctk.set_default_color_theme("dark-blue")
-# 
-# root = ctk.CTk()
-# root.title("password manager")
-# root.geometry("600x450")
+class PasswordManager(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-# frame = ctk.CTkFrame(master=root)
-# frame.pack(pady=15,padx=35,fill="both",expand=True)
+        # Create the main frame
+        self.container = CTkFrame(self)
+        self.container.pack(fill='both', expand=True)
 
-# user_entry =ctk.CTkEntry(master=frame,placeholder_text="username")
-# user_entry.pack(pady=2,padx=10)
-# password_entry = ctk.CTkEntry(master=frame,placeholder_text="password",show="*")
-# password_entry.pack(pady=2,padx=10)
+        # Create the login frame
+        self.login_frame = LoginFrame(self.container)
+        self.login_frame.place(relx=0.5, rely=0.5, anchor='center')
 
-# button =ctk.CTkButton(master=frame, text="Login", width=120, height=32, command=frame_exit())
-# button.pack(pady=2,padx=10)
-# root.mainloop()
+        # Create the add user frame
+        self.add_user_frame = AddUserFrame(self.container)
+        self.add_user_frame.place(relx=0.5, rely=0.5, anchor='center')
 
-def validate_login(username, password):
-    # Check if the username and password are valid
-    # (e.g. by looking up the credentials in a database)
-    if username == "user" and password == "password":
-        return True
-    else:
-        return False
+        # Show the login frame
+        self.show_frame('login')
 
-def login():
-    username = username_entry.get()
-    password = password_entry.get()
+    def show_frame(self, frame_name):
+        # Raise the specified frame to the top
+        frame = getattr(self, f'{frame_name}_frame')
+        frame.tkraise()
 
-    if validate_login(username, password):
-        login_status_label.config(text="Login successful!", fg="green")
-    else:
-        login_status_label.config(text="Invalid username or password", fg="red")
+class LoginFrame(CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
 
-root = ctk.CTk()
-root.title("Login Page")
-root.geometry("600x450")
+        # Create the username entry
+        self.username_label = CTkLabel(self, text='Username:')
+        self.username_label.pack(side='top', pady=5)
+        self.username_entry = CTkEntry(self)
+        self.username_entry.pack(side='top', pady=5)
 
-# Create the username label and entry
-username_label = ctk.CTkLabel(root, text="Username")
-username_label.pack()
-username_entry = ctk.CTkEntry(root)
-username_entry.pack()
+        # Create the password entry
+        self.password_label = CTkLabel(self, text='Password:')
+        self.password_label.pack(side='top', pady=5)
+        self.password_entry = CTkEntry(self, show='*')
+        self.password_entry.pack(side='top', pady=5)
 
-# Create the password label and entry
-password_label = ctk.CTkLabel(root, text="Password")
-password_label.pack()
-password_entry = ctk.CTkEntry(root, show="*")
-password_entry.pack()
+        # Create the login button
+        self.login_button = CTkButton(self, text='Login', command=self.login)
+        self.login_button.pack(side='top', pady=5)
 
-# Create the login button
-login_button = ctk.CTkButton(root, text="Login", command=login)
-login_button.pack()
+        # Create the add user button
+        self.add_user_button = CTkButton(self, text='Add User', command=lambda: parent.master.show_frame('add_user'))
+        self.add_user_button.pack(side='top', pady=5)
 
-# Create the login status label
-login_status_label = ctk.CTkLabel(root, text="")
-login_status_label.pack()
+    def login(self):
+        # Check the username and password
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        # ...
+        # Login logic here
+        # ...
 
-root.mainloop()
+class AddUserFrame(CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        # Create the username entry
+        self.username_label = CTkLabel(self, text='New Username:')
+        self.username_label.pack(side='top', pady=5)
+        self.username_entry = CTkEntry(self)
+        self.username_entry.pack(side='top', pady=5)
+
+        # Create the password entry
+        self.password_label = CTkLabel(self, text='New Password:')
+        self.password_label.pack(side='top', pady=5)
+        self.password_entry = CTkEntry(self, show='*')
+        self.password_entry.pack(side='top', pady=5)
+
+        # Create the add user button
+        self.add_user_button = CTkButton(self, text='Add User', command=self.adding_user)
+        self.add_user_button.pack(side='top', pady=5)
+        
+        #Create a add user label
+        add_user_status_label = CTkLabel(self, text="")
+        add_user_status_label.pack(side='top',pady=5)
+
+        # Create the back button
+        self.back_button = CTkButton(self, text='Back', command=lambda: parent.master.show_frame('login'))
+        self.back_button.pack(side='top', pady=5)
+
+    def adding_user(self):
+        # Add the user
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        if len(password) >= 16:
+            add_user_status_label.configure(text='password exceeded 24 chr length')
+            return None
+        else:
+            if len(password) < 16:
+                password = password.ljust(16, '\x00')
+            login_module.add_user(username,password)
+
+# Create the PasswordManager instance
+app = PasswordManager()
+
+# Start the event loop
+app.mainloop()
