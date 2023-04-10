@@ -45,6 +45,10 @@ class LoginFrame(CTkFrame):
         # Create the login button
         self.login_button = CTkButton(self, text='Login', command=self.login)
         self.login_button.pack(side='top', pady=5)
+        
+        #Create a login status label
+        self.login_status_label = CTkLabel(self, text="")
+        self.login_status_label.pack(side='top',pady=5)
 
         # Create the add user button
         self.add_user_button = CTkButton(self, text='Add User', command=lambda: parent.master.show_frame('add_user'))
@@ -54,9 +58,10 @@ class LoginFrame(CTkFrame):
         # Check the username and password
         username = self.username_entry.get()
         password = self.password_entry.get()
-        # ...
-        # Login logic here
-        # ...
+        if login_module.user_login(username, password) == True:
+            self.login_status_label.configure(text="login in successfully",border_color="green", text_color="green")
+        else:
+            self.login_status_label.configure(text="login in unsuccessfully",border_color="red", text_color="red")
 
 class AddUserFrame(CTkFrame):
     def __init__(self, parent):
@@ -79,8 +84,8 @@ class AddUserFrame(CTkFrame):
         self.add_user_button.pack(side='top', pady=5)
         
         #Create a add user label
-        add_user_status_label = CTkLabel(self, text="")
-        add_user_status_label.pack(side='top',pady=5)
+        self.add_user_status_label = CTkLabel(self, text="")
+        self.add_user_status_label.pack(side='top',pady=5)
 
         # Create the back button
         self.back_button = CTkButton(self, text='Back', command=lambda: parent.master.show_frame('login'))
@@ -91,7 +96,7 @@ class AddUserFrame(CTkFrame):
         username = self.username_entry.get()
         password = self.password_entry.get()
         if len(password) >= 16:
-            add_user_status_label.configure(text='password exceeded 24 chr length')
+            self.add_user_status_label.configure(text='password exceeded 24 chr length',border_color='red',font_color='red')
             return None
         else:
             if len(password) < 16:
