@@ -45,23 +45,23 @@ class LoginFrame(CTkFrame):
         # Create the login button
         self.login_button = CTkButton(self, text='Login', command=self.login)
         self.login_button.pack(side='top', pady=5)
-        
-        #Create a login status label
-        self.login_status_label = CTkLabel(self, text="")
-        self.login_status_label.pack(side='top',pady=5)
 
         # Create the add user button
         self.add_user_button = CTkButton(self, text='Add User', command=lambda: parent.master.show_frame('add_user'))
         self.add_user_button.pack(side='top', pady=5)
+        
+        #Create a login status label
+        self.login_status_label = CTkLabel(self, text="")
+        self.login_status_label.pack(side='top',pady=5)
 
     def login(self):
         # Check the username and password
         username = self.username_entry.get()
         password = self.password_entry.get()
         if login_module.user_login(username, password) == True:
-            self.login_status_label.configure(text="login in successfully",border_color="green", text_color="green")
+            self.login_status_label.configure(text="login in successfully", text_color="green")
         else:
-            self.login_status_label.configure(text="login in unsuccessfully",border_color="red", text_color="red")
+            self.login_status_label.configure(text="login in unsuccessfully",bg="red", text_color="red")
 
 class AddUserFrame(CTkFrame):
     def __init__(self, parent):

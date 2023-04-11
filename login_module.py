@@ -34,8 +34,10 @@ def user_login(user_id, password):
                 iv = row[1]
                 encrypted_passkey = row[2] 
     
+    #converting back to bytes
     iv = bytes.fromhex(iv)
     encrypted_passkey = bytes.fromhex(encrypted_passkey)
+    
     cipher =AES.new(key, AES.MODE_CBC, iv)
     passkey = unpad(cipher.decrypt(encrypted_passkey),16).decode('utf-8').replace("\x0e", "")
     if passkey == 'USER AUTHENTICATED':
