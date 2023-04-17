@@ -6,7 +6,7 @@ import csv
 def add_user(user_id, password):
     # Getting 16-byte key for AES encryption
     key = password.encode('utf-8')
-    #passkey="USER AUTHENTAICATED"
+    
     # Use the key to encrypt the passkey
     passkey = 'USER AUTHENTICATED'.encode('UTF-8')
     passkey = pad(passkey, 16)
@@ -26,7 +26,8 @@ def add_user(user_id, password):
 
 def user_login(user_id, password):
     key =password.ljust(16,'\x00').encode('UTF-8')
-    #with open('data\\user.csv',mode='a', newline='') as file:
+    
+    #opening a user file to find and autinticate the user
     with open('data\\user.csv',mode='r',newline='') as file:
         csv_reader = csv.reader(file)
         for row in csv_reader:
@@ -39,8 +40,11 @@ def user_login(user_id, password):
     encrypted_passkey = bytes.fromhex(encrypted_passkey)
     
     cipher =AES.new(key, AES.MODE_CBC, iv)
-    passkey = unpad(cipher.decrypt(encrypted_passkey),16).decode('utf-8').replace("\x0e", "")
-    if passkey == 'USER AUTHENTICATED':
-        return True
-    else:
+    try:
+        passkey = unpad(cipher.decrypt(encrypted_passkey),16).decode('utf-8').replace("\x0e", "")
+        if passkey == 'USER AUTHENTICATED':
+            return True
+        return False
+    
+    except ValueError:
         return False

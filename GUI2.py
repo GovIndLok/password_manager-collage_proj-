@@ -1,3 +1,5 @@
+import customtkinter as ctk
+
 def validate_login(username, password):
     # Check if the username and password are valid
     # (e.g. by looking up the credentials in a database)
@@ -11,9 +13,9 @@ def login():
     password = password_entry.get()
 
     if validate_login(username, password):
-        login_status_label.configure(text="Login successful!", fg="green")
+        login_status_label.configure(text = "Login successful!", text_color = "green")
     else:
-        login_status_label.configure(text="Invalid username or password", fg="red")
+        login_status_label.configure(text = "Invalid username or password", text_color ="red")
 
 root = ctk.CTk()
 root.title("Login Page")
