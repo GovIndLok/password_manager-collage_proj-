@@ -4,24 +4,23 @@ import login_module
 import encryption_module
 import os
 import csv
+        
 
 #root class for the main application
 class PasswordManager(tk.Tk):
     def __init__(self):
-        super().__init__()
-        
-        #universal variables to identify user
-        self.UserName = ''
-        self.Master_Password = ''
+        super().__init__() 
 
         # Create the main frame
         self.container = CTkFrame(self)
         self.container.pack(fill='both', expand=True)
         self.geometry("550x500")
         
+        # Creating session object
+        self.session = {}
 
         # Create the login frame
-        self.login_frame = LoginFrame(self.container)
+        self.login_frame = LoginFrame(self.container, session=self.session)
         self.login_frame.place(relx=0.5, rely=0.5, anchor='center')
 
         # Create the add user frame
@@ -29,9 +28,8 @@ class PasswordManager(tk.Tk):
         self.add_user_frame.place(relx=0.5, rely=0.5, anchor='center')
         
         # Creating password manger field
-        self.password_table_frame = PasswordFrame(self.container)
         
-        self.password_table_frame.pack_forget() 
+        #self.password_table_frame.pack_forget() 
 
         # Show the login frame
         self.show_frame('add_user','login')
@@ -47,21 +45,18 @@ class PasswordManager(tk.Tk):
     def show_table(self, frame_name):
         frame = getattr(self, f'{frame_name}_frame')
         frame.destroy()
+        self.password_table_frame = PasswordFrame(self.container, self.session['username'],self.session['passkey'])
         self.password_table_frame.pack(fill='both', expand = True)
         self.password_table_frame.place(relx = 0.0, rely = 0.0, anchor = "nw")
         self.password_table_frame.tkraise()
-        #Create a scrollable frame
-        #Create main frame
-        #self.scrollable = CTkScrollableFrame(self)
-    
-    def use(self, user, passkey):
-        self.UserName =user
-        self.Master_Password = passkey        
+        
 
 #login frame configration
 class LoginFrame(CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, session):
         super().__init__(parent)
+        
+        self.session = session
 
         # Create the username entry
         self.username_label = CTkLabel(self, text='Username:')
@@ -89,16 +84,15 @@ class LoginFrame(CTkFrame):
         
         self.table_screen = parent.master
         
-    def updatedata(self, user, data):
-        self.table_screen.use(user,data)
-
     def login(self):
         # Check the username and password
-        username = self.username_entry.get()
+        user = self.username_entry.get()
         password = self.password_entry.get()
-        if login_module.user_login(username, password) == True:
+        if login_module.user_login(user, password) == True:
             self.login_status_label.configure(text="login in successfully", text_color="green")
-            self.updatedata(username,password)
+            
+            self.session['username'] = user
+            self.session['passkey'] = password
             self.table_screen.show_table('login')
         else:
             self.login_status_label.configure(text="login in unsuccessfully", text_color="red")
@@ -131,8 +125,9 @@ class AddUserFrame(CTkFrame):
         self.back_button = CTkButton(self, text='Back', command=lambda: parent.master.show_frame('add_user','login'))
         self.back_button.pack(side='top', pady=5)
         
-        self.un = parent.master.UserName 
-        self.passw = parent.master.Master_Password
+        #self.un = parent.master.UserName 
+        #self.passw = parent.master.Master_Password
+        self.parent = parent.master
 
     def adding_user(self):
         # Add the user
@@ -150,12 +145,12 @@ class AddUserFrame(CTkFrame):
             self.master.show_table('add_user')
             
 class PasswordFrame(CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, usern, passk):
         super().__init__(parent)
         
-        # Inheriting the user and password
-        self.passkey = parent
-        self.user = parent
+        
+        self.user =usern
+        self.passkey = passk
         
         # Configuring the Grid
         self.grid_columnconfigure((0,1,2),weight=0)
@@ -188,14 +183,15 @@ class PasswordFrame(CTkFrame):
         self.generate_password_button = CTkButton(self.add_password_frame, text='Create\n Password', command=self.generatepassword)
         self.generate_password_button.grid(row=2, column=2, padx=5, pady=5, sticky = 'nsew')
         
+        # Creation of scrollable frame 
         self.scrollable_frame  = CTkScrollableFrame(self)
         self.scrollable_frame.grid(row =3,column=0, columnspan=3)#,rowspan=3)
         self.scrollable_frame.grid_columnconfigure((0,1),weight=1)
         self.scrollable_frame_button = []
         self.scrollable_frame_label = []
-        password_filepath = f'data\\user_data\\{parent.master.UserName}.csv'
+        self.password_filepath = f'data\\user_data\\{self.user}.csv'
         try:
-            with open(password_filepath,mode='r',newline='') as csvfile:
+            with open(self.password_filepath,mode='r',newline='') as csvfile: #getting a reader for the file
                 read = csv.reader(csvfile)
                 reader = list(read)
             # Showing the password list in the table
@@ -220,7 +216,7 @@ class PasswordFrame(CTkFrame):
             self.add_password_label.configure(text="Password excced\n 32 caracters", text_color='red')
             return None
         else:
-            encryption_module.encrypt_password(user=PasswordManager.UserName,service=service,key=PasswordManager.Master_Password,password=password)
+            encryption_module.encrypt_password(user=self.user,service=service,key=self.passkey,password=password)
             self.add_password_label.configure(text="Password added\n successfully", text_color='green')
             
     
