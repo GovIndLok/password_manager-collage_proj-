@@ -15,7 +15,7 @@ class PasswordManager(tk.Tk):
         # Create the main frame
         self.container = CTkFrame(self)
         self.container.pack(fill='both', expand=True)
-        self.geometry('372x500')
+        self.geometry('424x500')
         self.title("Password Manager 🔐")
         
         # Creating session object
@@ -180,7 +180,7 @@ class PasswordFrame(CTkFrame):
         self.see_password_button = CTkCheckBox(self.add_password_frame,text='👁',command=self.password_visib)
         self.see_password_button.grid(row=1,column=2,padx=5,pady=5,sticky='nsew')
         # Creating a add password label
-        self.add_password_label = CTkLabel(self.add_password_frame, text='||             ||')
+        self.add_password_label = CTkLabel(self.add_password_frame, text='||             ||',height=40,width=105)
         self.add_password_label.grid(row=2, column=1,columnspan=1, padx=5, pady=5, sticky = 'nsew')
         
         # Creating Generate password button
@@ -213,7 +213,7 @@ class PasswordFrame(CTkFrame):
                 self.scrollable_frame_button.append(password_copy_button)
                 
                 # Password status label
-                status_label = CTkLabel(self.scrollable_frame, text='||             ||')
+                status_label = CTkLabel(self.scrollable_frame, text='|| _ _ _ _ _ _ _ ||')
                 status_label.grid(row=index,column=1,padx=5,pady=5)
                 self.scrollable_frame_status.append(status_label)
         except FileNotFoundError:

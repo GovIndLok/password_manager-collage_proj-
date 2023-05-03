@@ -29,9 +29,12 @@ def user_login(user_id, password):
     
     #opening a user file to find and autinticate the user
     with open('data\\user.csv',mode='r',newline='') as file:
-        csv_reader = csv.reader(file)
+        csv_read = csv.reader(file)
+        next(csv_read)
+        csv_reader = list(csv_read)
         for row in csv_reader:
-            if row[0] == 'test1':
+            user = row[0]
+            if user == user_id:
                 iv = row[1]
                 encrypted_passkey = row[2] 
     
