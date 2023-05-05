@@ -1,6 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
+import string
 import base64
 import csv
 import os
@@ -49,4 +50,25 @@ def decrypt(key, iv, encrypted_password):
     decrypted_password = unpad(decrypted_password_bytes, 16).decode('utf-8').replace('\x0e', '')
     
     return decrypted_password
+
+
+# Generate password
+def generate_password(length=18):
+    # Defining characters used for making the password
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    integers = string.digits
+    special_symb = string.punctuation
     
+    # Combining every set
+    all_set = lowercase + uppercase + integers + special_symb
+    
+    # Generating the random password
+    random_bytes = get_random_bytes(length)
+    password = ''
+    for i in random_bytes:
+        password += all_set[i % len(all_set)]
+    
+    return password
+     
+     

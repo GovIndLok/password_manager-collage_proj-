@@ -179,12 +179,13 @@ class PasswordFrame(CTkFrame):
         # Creating a see password button
         self.see_password_button = CTkCheckBox(self.add_password_frame,text='👁',command=self.password_visib)
         self.see_password_button.grid(row=1,column=2,padx=5,pady=5,sticky='nsew')
+        
         # Creating a add password label
         self.add_password_label = CTkLabel(self.add_password_frame, text='||             ||',height=40,width=105)
         self.add_password_label.grid(row=2, column=1,columnspan=1, padx=5, pady=5, sticky = 'nsew')
         
         # Creating Generate password button
-        self.generate_password_button = CTkButton(self.add_password_frame, text='Create\n Password', command=self.generatepassword)
+        self.generate_password_button = CTkButton(self.add_password_frame, text='Create\n Password', command=lambda : self.add_password_entry.insert(0, encryption_module.generate_password()))
         self.generate_password_button.grid(row=2, column=2, padx=5, pady=5, sticky = 'nsew')
         
         # Creation of scrollable frame 
@@ -237,16 +238,14 @@ class PasswordFrame(CTkFrame):
             self.add_password_entry.configure(show='')
         else:
             self.add_password_entry.configure(show='*')
-        
-    def generatepassword():
-        t
+    
     
     def decrypt_copy(self,initializer_vector,encrypt_pass,row):
         
         decrypted_password = encryption_module.decrypt(self.passkey, initializer_vector, encrypt_pass)
         pyperclip.copy(decrypted_password)
         self.scrollable_frame_status[row].configure(text='copy successfully!', text_color='green')
-        #
+        
 
 # Create the PasswordManager instance
 app = PasswordManager()
