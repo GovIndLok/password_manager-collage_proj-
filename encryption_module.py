@@ -29,7 +29,7 @@ def encrypt_password(user, service, key, password):
     #checking if the file exist
     file_path = f'data\\user_data\\{user}.csv'
     if os.path.isfile(file_path) == False:
-        with open(file_path,mode='w',newline='') as csvfile:
+        with open(file_path, mode='w',newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['service','iv','password'])
         

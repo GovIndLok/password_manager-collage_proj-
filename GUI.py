@@ -26,7 +26,7 @@ class PasswordManager(tk.Tk):
         self.login_frame.place(relx=0.5, rely=0.5, anchor='center')
 
         # Create the add user frame
-        self.add_user_frame = AddUserFrame(self.container)
+        self.add_user_frame = AddUserFrame(self.container, session = self.session)
         self.add_user_frame.place(relx=0.5, rely=0.5, anchor='center')
 
         # Show the login frame
@@ -90,8 +90,7 @@ class LoginFrame(CTkFrame):
         user = self.username_entry.get()
         password = self.password_entry.get()
         if login_module.user_login(user, password) == True:
-            self.login_status_label.configure(text="login in successfully", text_color="green")
-            
+            self.login_status_label.configure(text="login in successfully", text_color="green") 
             self.session['username'] = user
             self.session['passkey'] = password
             self.table_screen.show_table('login')
@@ -99,8 +98,10 @@ class LoginFrame(CTkFrame):
             self.login_status_label.configure(text="login in unsuccessfully", text_color="red")
 
 class AddUserFrame(CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, session):
         super().__init__(parent)
+        
+        self.session = session
 
         # Create the username entry
         self.username_label = CTkLabel(self, text='New Username:')
@@ -126,7 +127,7 @@ class AddUserFrame(CTkFrame):
         self.back_button = CTkButton(self, text='Back', command=lambda: parent.master.show_frame('add_user','login'))
         self.back_button.pack(side='top', pady=5)
         
-        self.parent = parent.master
+        self.table = parent.master
 
     def adding_user(self):
         # Add the user
@@ -139,9 +140,10 @@ class AddUserFrame(CTkFrame):
             if len(password) < 16:
                 password = password.ljust(16, '\x00')
             login_module.add_user(username,password)
-            self.un = username
-            self.passw = password
-            self.master.show_table('add_user')
+            self.session['username'] = username
+            self.session['passkey'] = password
+            self.add_user_status_label.configure(text='User Created',text_color='green')
+            self.table.show_table('add_user')
             
 class PasswordFrame(CTkFrame):
     def __init__(self, parent, usern, passk):
@@ -214,7 +216,7 @@ class PasswordFrame(CTkFrame):
                 self.scrollable_frame_button.append(password_copy_button)
                 
                 # Password status label
-                status_label = CTkLabel(self.scrollable_frame, text='|| _ _ _ _ _ _ _ ||')
+                status_label = CTkLabel(self.scrollable_frame, text='_ _ _ _ _ _ _ _ _',width=115)
                 status_label.grid(row=index,column=1,padx=5,pady=5)
                 self.scrollable_frame_status.append(status_label)
         except FileNotFoundError:
@@ -231,6 +233,7 @@ class PasswordFrame(CTkFrame):
         else:
             encryption_module.encrypt_password(user=self.user,service=service,key=self.passkey,password=password)
             self.add_password_label.configure(text="Password added\n successfully", text_color='green')
+        
             
     def password_visib(self):
         status=self.see_password_button.get()
