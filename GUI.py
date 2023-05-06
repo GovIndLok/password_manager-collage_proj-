@@ -197,7 +197,11 @@ class PasswordFrame(CTkFrame):
         self.scrollable_frame_button = []
         self.scrollable_frame_label = []
         self.scrollable_frame_status = []
+        self.update_password = []
         self.password_filepath = f'data\\user_data\\{self.user}.csv'
+        self.table_content()
+        
+    def table_content(self):
         try:
             with open(self.password_filepath,mode='r',newline='') as csvfile: #getting a reader for the file
                 read = csv.reader(csvfile)
@@ -209,20 +213,24 @@ class PasswordFrame(CTkFrame):
                 password_service_label = CTkLabel(self.scrollable_frame, text=entry[0])
                 password_service_label.grid(row=index,column=0, padx=5, pady=5)
                 self.scrollable_frame_label.append(password_service_label)
-            
-                # Showing the button
-                password_copy_button = CTkButton(self.scrollable_frame,text='Copy',command=lambda iv=entry[1], password=entry[2], ind=index:self.decrypt_copy(initializer_vector=iv, encrypt_pass=password, row=ind))
-                password_copy_button.grid(row=index,column=2,padx=5,pady=5)
-                self.scrollable_frame_button.append(password_copy_button)
                 
                 # Password status label
                 status_label = CTkLabel(self.scrollable_frame, text='_ _ _ _ _ _ _ _ _',width=115)
                 status_label.grid(row=index,column=1,padx=5,pady=5)
                 self.scrollable_frame_status.append(status_label)
+                
+                # Showing the button
+                password_copy_button = CTkButton(self.scrollable_frame,text='Copy',command=lambda iv=entry[1], password=entry[2], ind=index:self.decrypt_copy(initializer_vector=iv, encrypt_pass=password, row=ind))
+                password_copy_button.grid(row=index,column=2,padx=5,pady=5)
+                self.scrollable_frame_button.append(password_copy_button)
+                
+                # Show Update Button
+                update_button = CTkButton(self.scrollable_frame, text='🔃',width=35)
+                update_button.grid(row=index, column=3, padx=5, pady=5)
         except FileNotFoundError:
             # Will show No password banner when there are no password
             self.table_empty_window = CTkLabel(self.scrollable_frame, text="No Saved Passwords", font=CTkFont(size=15, weight="bold"))
-            self.table_empty_window.grid(row=1,column=1)
+            self.table_empty_window.grid(row=1,column=1)        
         
     def addpassword_fun(self):
         service = self.password_service_entry.get()
@@ -233,6 +241,13 @@ class PasswordFrame(CTkFrame):
         else:
             encryption_module.encrypt_password(user=self.user,service=service,key=self.passkey,password=password)
             self.add_password_label.configure(text="Password added\n successfully", text_color='green')
+            
+            # Removing the table content and rereading them
+            self.add_password_button = []
+            self.add_password_entry = []
+            self.add_password_label = []
+            self.update_password = []
+            self.table_content()
         
             
     def password_visib(self):

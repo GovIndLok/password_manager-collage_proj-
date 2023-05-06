@@ -70,5 +70,24 @@ def generate_password(length=18):
         password += all_set[i % len(all_set)]
     
     return password
-     
-     
+
+# Update password entry
+def update_password(file_path, service, passkey, new_password):
+        
+        # Getting the new iv and encrypted password
+        
+        # user file open to access content
+        with open(file_path, mode='r', newline='') as csvfile:
+            read = csv.reader(csvfile)
+            reader = list(read)
+        
+        # Replacing old iv and password with new ones    
+        for i, row in enumerate(reader):
+            if row[0] == service:
+                row[1] = new_iv
+                row[2] = new_password
+        
+        # Rewriting the update content back in the file
+        with open(file_path, mode='w',newline='') as csvfile:
+            write = csv.writer(csvfile)
+            write.writerows(reader)
