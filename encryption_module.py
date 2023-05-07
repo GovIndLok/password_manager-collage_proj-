@@ -19,9 +19,6 @@ def encrypt_password(user, service, key, password):
     # Generate a new 16-byte initialization vector (IV)
     iv = AES.new(key, AES.MODE_CBC).iv
     
-    #generating a 16-bytes header
-    header = get_random_bytes(16)
-    
     # Use the key and IV to encrypt the password using AES encryption in CBC mode
     cipher = AES.new(key, AES.MODE_CBC, iv)
     encrypted_password = cipher.encrypt(password_bytes)
@@ -72,9 +69,15 @@ def generate_password(length=18):
     return password
 
 # Update password entry
-def update_password(file_path, service, passkey, new_password):
+def update_password(file_path, index, passkey, new_password):
         
-        # Getting the new iv and encrypted password
+        # Getting the new iv and encoding key 
+        key = passkey.ljust(16,'\x00').encode('utf-8')
+        new_iv = AES.new(key, AES.MODE_CBC).iv
+        password_bytes = new_password.encode('utf-8')
+        password_bytes = pad(password_bytes, 16)
+        cipher = AES.new(key, AES.MODE_CBC, new_iv)
+        new_encrypt_password = cipher.encrypt(password_bytes)
         
         # user file open to access content
         with open(file_path, mode='r', newline='') as csvfile:
@@ -83,9 +86,9 @@ def update_password(file_path, service, passkey, new_password):
         
         # Replacing old iv and password with new ones    
         for i, row in enumerate(reader):
-            if row[0] == service:
-                row[1] = new_iv
-                row[2] = new_password
+            if i == (index + 1):
+                row[1] = new_iv.hex()
+                row[2] = new_encrypt_password.hex()
         
         # Rewriting the update content back in the file
         with open(file_path, mode='w',newline='') as csvfile:

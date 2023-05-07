@@ -161,10 +161,6 @@ class PasswordFrame(CTkFrame):
         #creating add password frame
         self.add_password_frame = CTkFrame(self)
         self.add_password_frame.grid(row=0,column=0,columnspan=3,rowspan=3,padx=5,pady=5,sticky='nsew')
-        self.add_password_frame.grid_columnconfigure(0,weight=0)
-        self.add_password_frame.grid_columnconfigure(1,weight=1)
-        self.add_password_frame.grid_columnconfigure(2,weight=0)
-        self.add_password_frame.grid_rowconfigure((0,1,2), weight=0)
         
         # Creating add password service entry filed
         self.password_service_entry = CTkEntry(self.add_password_frame, placeholder_text="Service Name")
@@ -194,14 +190,16 @@ class PasswordFrame(CTkFrame):
         self.scrollable_frame  = CTkScrollableFrame(self,label_text='Saved Passwords')
         self.scrollable_frame.grid(row=3,column=0,columnspan=3,rowspan=3,padx=5,pady=5,sticky='nsew')
         self.scrollable_frame.grid_columnconfigure((0,1,2),weight=0)
+        
+        self.password_filepath = f'data\\user_data\\{self.user}.csv'
+        self.table_content(path=self.password_filepath)
+        
+    def table_content(self,path):
+        
         self.scrollable_frame_button = []
         self.scrollable_frame_label = []
         self.scrollable_frame_status = []
         self.update_password = []
-        self.password_filepath = f'data\\user_data\\{self.user}.csv'
-        self.table_content()
-        
-    def table_content(self):
         try:
             with open(self.password_filepath,mode='r',newline='') as csvfile: #getting a reader for the file
                 read = csv.reader(csvfile)
@@ -225,16 +223,19 @@ class PasswordFrame(CTkFrame):
                 self.scrollable_frame_button.append(password_copy_button)
                 
                 # Show Update Button
-                update_button = CTkButton(self.scrollable_frame, text='🔃',width=35)
+                update_button = CTkButton(self.scrollable_frame, text='🔃',width=35, command=lambda ind=index:self.password_updating(index=ind))
                 update_button.grid(row=index, column=3, padx=5, pady=5)
+                self.update_password.append(update_button)
+                
         except FileNotFoundError:
             # Will show No password banner when there are no password
             self.table_empty_window = CTkLabel(self.scrollable_frame, text="No Saved Passwords", font=CTkFont(size=15, weight="bold"))
             self.table_empty_window.grid(row=1,column=1)        
         
+    # Creating entries inside the table    
     def addpassword_fun(self):
         service = self.password_service_entry.get()
-        password =self.add_password_entry.get()
+        password = self.add_password_entry.get()
         if len(password) > 32:
             self.add_password_label.configure(text="Password excced\n 32 caracters", text_color='red')
             return None
@@ -243,13 +244,10 @@ class PasswordFrame(CTkFrame):
             self.add_password_label.configure(text="Password added\n successfully", text_color='green')
             
             # Removing the table content and rereading them
-            self.add_password_button = []
-            self.add_password_entry = []
-            self.add_password_label = []
-            self.update_password = []
-            self.table_content()
+            self.table_content(path=self.password_filepath)
         
-            
+    
+    # Logic for visibility option of the entered code        
     def password_visib(self):
         status=self.see_password_button.get()
         if status:
@@ -258,12 +256,21 @@ class PasswordFrame(CTkFrame):
             self.add_password_entry.configure(show='*')
     
     
+    # Logic to decrypt and copy to clipboard
     def decrypt_copy(self,initializer_vector,encrypt_pass,row):
         
         decrypted_password = encryption_module.decrypt(self.passkey, initializer_vector, encrypt_pass)
         pyperclip.copy(decrypted_password)
         self.scrollable_frame_status[row].configure(text='copy successfully!', text_color='green')
+    
+    # Module which take new password and update entry
+    def password_updating(self, index):
         
+        # Creating input frame
+        password = CTkInputDialog(text="Enter new Password: ",title='update password')
+        encryption_module.update_password(file_path=self.password_filepath, index=index, passkey=self.passkey, new_password=password.get_input())
+        self.table_content(path=self.password_filepath)
+
 
 # Create the PasswordManager instance
 app = PasswordManager()
