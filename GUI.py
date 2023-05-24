@@ -20,6 +20,10 @@ class PasswordManager(tk.Tk):
         
         # Creating session object
         self.session = {}
+        
+        #Creating Menu bar
+        self.configure_menu()
+        
 
         # Create the login frame
         self.login_frame = LoginFrame(self.container, session=self.session)
@@ -30,8 +34,39 @@ class PasswordManager(tk.Tk):
         self.add_user_frame.place(relx=0.5, rely=0.5, anchor='center')
 
         # Show the login frame
-        self.show_frame('add_user','login')
-
+        self.show_frame('add_user','login') 
+    
+    def configure_menu(self):
+        
+        # Creating a Menu Bar
+        menu_bar = tk.Menu(self)
+        
+        # Create a Theme menu
+        scale_menu = tk.Menu(menu_bar,tearoff=0)
+        scale_menu.add_command(label="80%", command=lambda: self.set_scaling(0.8))
+        scale_menu.add_command(label="90%", command=lambda: self.set_scaling(0.9))
+        scale_menu.add_command(label="100%", command=lambda: self.set_scaling(1.0))
+        scale_menu.add_command(label="120%", command=lambda: self.set_scaling(1.2))
+        
+        # Add the theme menu to the Menu Bar
+        menu_bar.add_cascade(label="Scaling",menu=scale_menu)
+        
+        # Config the menu bar
+        self.config(menu=menu_bar)
+    
+    # Function to resize window according to scaling    
+    def set_scaling(self,scale):
+        match scale:
+            case 0.8:
+                self.geometry('340x500')
+            case 0.9:
+                self.geometry('386x500')
+            case 1.0:
+                self.geometry('424x500')
+            case 1.2:
+                self.geometry('510x500')  
+        set_widget_scaling(scale)
+        
     def show_frame(self,hidd_frame, frame_name):
         #hidding the current frame
         h_frame = getattr(self, f'{hidd_frame}_frame')
@@ -274,6 +309,5 @@ class PasswordFrame(CTkFrame):
 
 # Create the PasswordManager instance
 app = PasswordManager()
-
 # Start the event loop
 app.mainloop()
