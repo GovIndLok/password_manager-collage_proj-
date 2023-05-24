@@ -16,14 +16,15 @@ class PasswordManager(tk.Tk):
         self.container = CTkFrame(self)
         self.container.pack(fill='both', expand=True)
         self.geometry('424x500')
-        self.title("Password Manager 🔐")
+        self.title("🔐 Password Manager")
+        
+        # G
         
         # Creating session object
         self.session = {}
         
         #Creating Menu bar
         self.configure_menu()
-        
 
         # Create the login frame
         self.login_frame = LoginFrame(self.container, session=self.session)
@@ -41,22 +42,32 @@ class PasswordManager(tk.Tk):
         # Creating a Menu Bar
         menu_bar = tk.Menu(self)
         
-        # Create a Theme menu
+        # Create a Scale menu
         scale_menu = tk.Menu(menu_bar,tearoff=0)
         scale_menu.add_command(label="80%", command=lambda: self.set_scaling(0.8))
         scale_menu.add_command(label="90%", command=lambda: self.set_scaling(0.9))
         scale_menu.add_command(label="100%", command=lambda: self.set_scaling(1.0))
         scale_menu.add_command(label="120%", command=lambda: self.set_scaling(1.2))
         
+        # change the apperance mode
+        mode_menu = tk.Menu(menu_bar,tearoff = 0)
+        mode_menu.add_command(label="Light", command=lambda: set_appearance_mode('light'))
+        mode_menu.add_command(label="Dark", command=lambda: set_appearance_mode('dark'))
+        mode_menu.add_command(label="System", command=lambda: set_appearance_mode("system"))
+        theme = self.option_get("CTkAppearanceModeBaseClass", "theme")
+        
         # Add the theme menu to the Menu Bar
         menu_bar.add_cascade(label="Scaling",menu=scale_menu)
+        
+        # Add the mode change to menu bar
+        menu_bar.add_cascade(label="mode",menu=mode_menu)
         
         # Config the menu bar
         self.config(menu=menu_bar)
     
     # Function to resize window according to scaling    
-    def set_scaling(self,scale):
-        match scale:
+    def set_scaling(self,scal):
+        match scal:
             case 0.8:
                 self.geometry('340x500')
             case 0.9:
@@ -65,8 +76,9 @@ class PasswordManager(tk.Tk):
                 self.geometry('424x500')
             case 1.2:
                 self.geometry('510x500')  
-        set_widget_scaling(scale)
-        
+        set_widget_scaling(scal)
+     
+    
     def show_frame(self,hidd_frame, frame_name):
         #hidding the current frame
         h_frame = getattr(self, f'{hidd_frame}_frame')
