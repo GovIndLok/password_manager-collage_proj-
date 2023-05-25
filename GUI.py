@@ -5,6 +5,7 @@ import encryption_module
 import os
 import csv
 import pyperclip
+import configparser
         
 
 #root class for the main application
@@ -18,7 +19,9 @@ class PasswordManager(tk.Tk):
         self.geometry('424x500')
         self.title("🔐 Password Manager")
         
-        # G
+        # Getting UI config of user
+        self.config_UI = configparser.ConfigParser()
+        self.load_config()
         
         # Creating session object
         self.session = {}
@@ -51,10 +54,9 @@ class PasswordManager(tk.Tk):
         
         # change the apperance mode
         mode_menu = tk.Menu(menu_bar,tearoff = 0)
-        mode_menu.add_command(label="Light", command=lambda: set_appearance_mode('light'))
-        mode_menu.add_command(label="Dark", command=lambda: set_appearance_mode('dark'))
-        mode_menu.add_command(label="System", command=lambda: set_appearance_mode("system"))
-        theme = self.option_get("CTkAppearanceModeBaseClass", "theme")
+        mode_menu.add_command(label="Light", command=lambda: self.set_appearance("light"))
+        mode_menu.add_command(label="Dark", command=lambda: self.set_appearance("dark"))
+        mode_menu.add_command(label="System", command=lambda: self.set_appearance("system"))
         
         # Add the theme menu to the Menu Bar
         menu_bar.add_cascade(label="Scaling",menu=scale_menu)
@@ -64,20 +66,61 @@ class PasswordManager(tk.Tk):
         
         # Config the menu bar
         self.config(menu=menu_bar)
-    
+        
+    def set_appearance(self,theme):
+        self.mode = theme
+        set_appearance_mode(theme)
+        self.save_config() 
+        
     # Function to resize window according to scaling    
     def set_scaling(self,scal):
+        geo = ''
         match scal:
             case 0.8:
                 self.geometry('340x500')
+                geo = '340x500'
             case 0.9:
                 self.geometry('386x500')
+                geo = '386x500'
             case 1.0:
                 self.geometry('424x500')
+                geo='424x500'
             case 1.2:
-                self.geometry('510x500')  
+                self.geometry('510x500')
+                geo='510x500'  
         set_widget_scaling(scal)
-     
+        self.scale = scal
+        self.geomet = geo
+        
+        self.save_config()
+
+    # Loading the UI config file
+    def load_config(self):
+        try:
+            self.config_UI.read('UI.ini')
+            self.mode = self.config_UI.get("UI_configure", "mode")
+            self.scale = float(self.config_UI.get("UI_configure", "scale"))
+            self.geomet = self.config_UI.get("UI_configure", "geometry")
+        except(configparser.Error, FileNotFoundError):
+            self.scale = 1.0
+            self.mode = 'dark'
+            self.geomet = '424x500'
+        set_appearance_mode(self.mode)
+        self.geometry(self.geomet)
+        set_widget_scaling(self.scale)
+    
+    def save_config(self):
+        
+        self.config_UI["UI_configure"] = {
+            "mode": self.mode,
+            "scale": self.scale,
+            "geometry": self.geomet
+        }
+        
+        # Saving the config 
+        with open("UI.ini","w") as configfile:
+            self.config_UI.write(configfile)
+
     
     def show_frame(self,hidd_frame, frame_name):
         #hidding the current frame
